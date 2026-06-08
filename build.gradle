@@ -21,3 +21,10 @@ dependencies {
 tasks.named('test') {
     useJUnitPlatform()
 }
+
+tasks.register('benchmark', JavaExec) {
+    classpath = sourceSets.main.runtimeClasspath
+    mainClass = 'com.fastbook.benchmark.BenchmarkRunner'
+    args = ['1000000', '42']
+    jvmArgs = ['-server', '-XX:+UseG1GC']
+}
