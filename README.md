@@ -13,6 +13,8 @@ I built this project to deepen my understanding of trading infrastructure, low-l
 - Partial fills
 - Best bid / best ask queries
 - Multi-symbol support
+- Synthetic benchmark runner with latency percentiles
+- Deterministic CSV event replay
 - Unit tests for matching correctness
 
 ## Technical Design
@@ -92,6 +94,29 @@ Benchmark: 1,000,000 synthetic limit orders across 5 symbols (AAPL, MSFT, NVDA, 
 | p99 latency | 1,291 ns |
 
 Measured on a single thread with `System.nanoTime()`. Results vary by hardware.
+
+## CSV Event Replay
+
+Feed a CSV file of order events through the engine and get deterministic trade output:
+
+```bash
+java -cp build/libs/FastBook-1.0-SNAPSHOT.jar com.fastbook.replay.ReplayRunner samples/sample_orders.csv
+```
+
+Input format:
+```csv
+timestamp,symbol,type,side,price,quantity,orderId
+1,AAPL,ADD,BUY,18750,100,1
+2,AAPL,ADD,SELL,18760,100,2
+3,AAPL,CANCEL,,,,1
+```
+
+Output:
+```csv
+timestamp,symbol,buyOrderId,sellOrderId,price,quantity
+```
+
+Supports ADD and CANCEL operations. Trades execute at the resting order's price.
 
 ## Future Work
 
